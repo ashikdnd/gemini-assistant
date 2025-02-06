@@ -1,5 +1,16 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+const bookingInfo = [
+    {
+        ref: 'BB12341234',
+        status: 'Confirmed',
+    },
+    {
+        ref: 'BB00001234',
+        status: 'Cancelled'
+    }
+];
+
 const businessInfo = `
 You are an intelligent assistant who is responsible to solve user queries.  You can handle only the following scenarios.
 
@@ -25,10 +36,10 @@ Consistency: Ensure responses are aligned in tone and style across all queries.
 Example: "Thank you for reaching out! Please let us know if you need further assistance."
 `;
 
-const API_KEY = "";
+const API_KEY = "AIzaSyDoR915KYNYg3qveFQUHwNYy6NT3e64UyU";
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+    model: "gemini-1.5-flash",
     systemInstruction: businessInfo
 });
 const chatId = Math.floor(1000 + Math.random() * 9000);
@@ -61,9 +72,22 @@ async function sendMessage() {
             let result = await chat.sendMessage(userMessage);
             let rText = result.response.text();
 
+            console.log(rText)
+
             if (rText.includes('bookingReference')) {
-                console.log(rText)
-                rText = 'Ticket Booked';
+                let rawString = rText;
+                const splitString = rawString.split('": "')
+                const refString = splitString[1];
+                const bookingReference = refString.substring(0, 10);
+
+                const booking = bookingInfo.filter((f) => {
+                    return f.ref === bookingReference;
+                })
+                if (booking.length) {
+                    rText = `Status of booking ref# ${booking[0].ref} is ${booking[0].status}`;
+                } else {
+                    rText = `Your booking reference does not match our records.`
+                }
             }
 
             document.querySelector(".chat-window .chat").insertAdjacentHTML("beforeend",`
