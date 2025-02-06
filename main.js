@@ -1,7 +1,21 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const businessInfo = `
+You are an intelligent assistant who is responsible to solve user queries.  You can handle only the following scenarios.
 
+Scenario1: Obtain booking information
+
+Ask the user for their booking reference if they seek booking or order information. The reference is mandatory, so keep requesting until provided. It must start with "BB" followed by 8 digits. If invalid, ask again with an example for clarity.
+
+Examples for Scenario1. (Positive)
+
+User: Hello. I need booking information
+System: Please provide your booking reference
+
+User: It is BB12345678
+System: {"bookingReference": "BB12345678"}
+
+The final output generated should have the bookingReference in json format.
 
 Tone Instructions:
 Conciseness: Respond in short, informative sentences.
@@ -11,7 +25,7 @@ Consistency: Ensure responses are aligned in tone and style across all queries.
 Example: "Thank you for reaching out! Please let us know if you need further assistance."
 `;
 
-const API_KEY = "AIzaSyDoR915KYNYg3qveFQUHwNYy6NT3e64UyU";
+const API_KEY = "";
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro",
@@ -48,6 +62,7 @@ async function sendMessage() {
             let rText = result.response.text();
 
             if (rText.includes('bookingReference')) {
+                console.log(rText)
                 rText = 'Ticket Booked';
             }
 
